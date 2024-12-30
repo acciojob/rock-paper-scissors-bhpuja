@@ -1,16 +1,174 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    .game-container {
+      margin-top: 20px;
+    }
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .choice {
+      padding: 10px 20px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+    }
+    .choice:hover {
+      background-color: #ddd;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    .scoreboard {
+      margin-top: 20px;
+    }
+  </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
+
+  <h1>Rock, Paper, Scissors</h1>
+
+  <!-- Input for Number of Turns -->
+  <input type="number" id="turns" data-ns-test="game-number" placeholder="Number of Turns">
+
+  <!-- Play Game Button -->
+  <button id="play" data-ns-test="play-game">Play Game</button>
+
+  <div class="game-container">
+    <!-- Choices -->
+    <div class="choices">
+      <div class="choice" id="rock" data-ns-test="rock">Rock</div>
+      <div class="choice" id="paper" data-ns-test="paper">Paper</div>
+      <div class="choice" id="scissors" data-ns-test="scissors">Scissors</div>
+    </div>
+
+    <!-- Round Result -->
+    <div id="round-result" data-ns-test="round-result"></div>
+
+    <!-- Computer Choice -->
+    <div id="computer-choice" data-ns-test="computer-choose"></div>
+
+    <!-- Rounds Left -->
+    <div id="rounds-left" data-ns-test="rounds-left"></div>
+
+    <!-- Points -->
+    <div class="scoreboard">
+      <div>User Points: <span id="user-points" data-ns-test="user-points">0</span></div>
+      <div>Computer Points: <span id="computer-points" data-ns-test="computer-points">0</span></div>
+    </div>
+
+    <!-- Game Result -->
+    <div id="game-result" data-ns-test="game-result"></div>
+  </div>
+
+  <script>
+    // Initialize global variables
+    let userPoints = 0;
+    let computerPoints = 0;
+    let turnsLeft = 0;
+    window.computerChoose = 0;
+
+    // Elements
+    const turnsInput = document.getElementById("turns");
+    const playButton = document.getElementById("play");
+    const roundResultEl = document.getElementById("round-result");
+    const computerChoiceEl = document.getElementById("computer-choice");
+    const roundsLeftEl = document.getElementById("rounds-left");
+    const userPointsEl = document.getElementById("user-points");
+    const computerPointsEl = document.getElementById("computer-points");
+    const gameResultEl = document.getElementById("game-result");
+    const choices = ["ROCK", "PAPER", "SCISSORS"];
+
+    // Start Game
+    playButton.addEventListener("click", () => {
+      turnsLeft = parseInt(turnsInput.value);
+      if (isNaN(turnsLeft) || turnsLeft <= 0) {
+        alert("Please enter a valid number of turns.");
+        return;
+      }
+      resetGame();
+    });
+
+    // Choice Buttons
+    document.querySelectorAll(".choice").forEach(choice => {
+      choice.addEventListener("click", () => {
+        if (turnsLeft > 0) {
+          const userChoice = choice.id.toUpperCase();
+          playRound(userChoice);
+        } else {
+          alert("Game over! Start a new game.");
+        }
+      });
+    });
+
+    // Reset Game
+    function resetGame() {
+      userPoints = 0;
+      computerPoints = 0;
+      roundsLeftEl.textContent = `Rounds Left: ${turnsLeft}`;
+      userPointsEl.textContent = userPoints;
+      computerPointsEl.textContent = computerPoints;
+      roundResultEl.textContent = "";
+      computerChoiceEl.textContent = "";
+      gameResultEl.textContent = "";
+    }
+
+    // Play a Round
+    function playRound(userChoice) {
+      // Generate computer choice
+      window.computerChoose = Math.floor(Math.random() * 3);
+      const computerChoice = choices[window.computerChoose];
+      computerChoiceEl.textContent = `Computer Chose: ${computerChoice}`;
+
+      // Determine round result
+      let roundResult = "";
+      if (userChoice === computerChoice) {
+        roundResult = "TIE";
+      } else if (
+        (userChoice === "ROCK" && computerChoice === "SCISSORS") ||
+        (userChoice === "PAPER" && computerChoice === "ROCK") ||
+        (userChoice === "SCISSORS" && computerChoice === "PAPER")
+      ) {
+        roundResult = "WON";
+        userPoints++;
+      } else {
+        roundResult = "LOSE";
+        computerPoints++;
+      }
+
+      // Update UI
+      roundResultEl.textContent = `Round Result: ${roundResult}`;
+      userPointsEl.textContent = userPoints;
+      computerPointsEl.textContent = computerPoints;
+      turnsLeft--;
+      roundsLeftEl.textContent = `Rounds Left: ${turnsLeft}`;
+
+      // Check for Game Over
+      if (turnsLeft === 0) {
+        const gameResult =
+          userPoints > computerPoints
+            ? "WON"
+            : userPoints < computerPoints
+            ? "LOSE"
+            : "TIE";
+        gameResultEl.textContent = `Game Result: ${gameResult}`;
+      }
+    }
+  </script>
 
 </body>
-
 </html>
